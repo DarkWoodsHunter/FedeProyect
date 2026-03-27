@@ -34,8 +34,6 @@ const LogrosCarousel: React.FC = () => {
     const raw = localStorage.getItem(user!.uid);
     const parsed = JSON.parse(raw!);
 
-    console.log(userData)
-
     return (
         <Slider dots={false} infinite={true} slidesToShow={5} slidesToScroll={1} vertical={true} verticalSwiping={true} speed={1000} autoplaySpeed={5000} autoplay={false}>
             {parsed.Logros?.map((ach: any, index: any) => {
