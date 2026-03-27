@@ -88,7 +88,7 @@ const Dashboard: React.FC = () => {
   const BOTTOM_ROW_HEIGHT = 470;
 
   return (
-    <DashboardLayout title="Dashboard" showNavbar={false}>
+    <DashboardLayout title="Dashboard" showNavbar={true}>
       <Box
         sx={{
           minHeight: "100%",

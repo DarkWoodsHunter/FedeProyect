@@ -31,6 +31,8 @@ import { loadSkills, Skill } from "../utils/skills";
 import { dashboardPalette } from "../theme";
 import profileIcon from "../assets/profile.png";
 import LogrosCarousel from "../components/LogrosCarousel";
+import ReactTimeAgo from "react-time-ago";
+import "react-time-ago/locale/es"
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -324,10 +326,10 @@ const ProfilePage: React.FC = () => {
                         variant="h4"
                         sx={{ color: "#ff6ddd", fontWeight: 800 }}
                       >
-                        {skills.length > 0
+                        {parsed?.Skill?.length > 0
                           ? Math.round(
-                            skills.reduce(
-                              (acc, skill) => acc + skill.level,
+                            parsed?.Skill.reduce(
+                              (acc: any, skill: any) => acc + skill.Progress,
                               0,
                             ) / skills.length,
                           )
@@ -492,7 +494,7 @@ const ProfilePage: React.FC = () => {
                     flex: 1,
                   }}
                 >
-                  {recentActivity.map((activity, index) => (
+                  {parsed.Notifications?.map((notif: any, index: number) => (
                     <Box
                       key={index}
                       sx={{
@@ -509,7 +511,6 @@ const ProfilePage: React.FC = () => {
                           width: 30,
                           height: 30,
                           borderRadius: "50%",
-                          bgcolor: activity.iconBg,
                           mr: 1.5,
                           display: "flex",
                           alignItems: "center",
@@ -517,7 +518,7 @@ const ProfilePage: React.FC = () => {
                           flexShrink: 0,
                         }}
                       >
-                        {activity.icon}
+                        {notif.Icon}
                       </Box>
                       <Box sx={{ flex: 1 }}>
                         <Typography
@@ -528,10 +529,13 @@ const ProfilePage: React.FC = () => {
                             lineHeight: 1.2,
                           }}
                         >
-                          {activity.action}
+                          {notif.Title}
                         </Typography>
                         <Typography variant="caption" sx={{ color: "#6c6c6c" }}>
-                          Hace {activity.time}
+                          {notif.Date ?
+                            <ReactTimeAgo date={notif.Date.seconds * 1000} locale="es" />
+                            :
+                            <></>}
                         </Typography>
                       </Box>
                     </Box>

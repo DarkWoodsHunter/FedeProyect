@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -17,6 +17,7 @@ import { Notifications, CheckCircle, Info, Warning } from "@mui/icons-material";
 import { useAuth } from "../contexts/AuthContext";
 import { dashboardPalette } from "../theme";
 import profileIcon from "../assets/profile.png";
+import { GetOneUser, Task } from "../firebase-config";
 
 interface NavbarProps {
   title: string;
@@ -25,10 +26,33 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ title }) => {
   const { user } = useAuth();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [userData, setUserData] = useState<Task[] | any>([]);
 
+  useEffect(() => {
+    if (user) {
+      GetOneUserdata()
+    }
+  }, [user]);
+
+  const GetOneUserdata = async () => {
+    if (user) {
+      const aTask = await GetOneUser(user.uid);
+      setUserData(aTask);
+    }
+  }
   const raw = localStorage.getItem(user!.uid);
   const parsed = JSON.parse(raw!);
 
+  function GetNotif() {
+    const NewArray = [];
+    for (let i = 0; i < parsed.Notifications.length; i++) {
+      if (parsed.Notifications[i].Checked === false) {
+        NewArray.push(parsed.Notifications[i])
+      }
+    }
+    return NewArray.length;
+  }
+  /** 
   const notifications = [
     {
       id: 1,
@@ -55,7 +79,7 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
       color: "#ff9800",
     },
   ];
-
+*/
   return (
     <AppBar
       position="static"
@@ -94,9 +118,11 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
               transition: "all 0.2s ease",
             }}
           >
-            <Badge badgeContent={3} color="error">
-              <Notifications />
-            </Badge>
+            {parsed?.Notifications ?
+              <Badge badgeContent={GetNotif()} color="error">
+                <Notifications />
+              </Badge>
+              : <></>}
           </IconButton>
 
           {/* User Avatar */}
@@ -132,7 +158,7 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
                   lineHeight: 1,
                 }}
               >
-                {"Nivel " + parsed.Nivel}
+                {"Nivel " + parsed?.Nivel}
               </Typography>
             </Box>
           </Box>
@@ -175,32 +201,34 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
               Notificaciones
             </Typography>
             <List>
-              {notifications.map((notification, index) => (
-                <React.Fragment key={notification.id}>
-                  <ListItem
-                    sx={{
-                      borderRadius: "16px",
-                      mb: 1,
-                      background: "rgba(255, 255, 255, 0.05)",
-                    }}
-                  >
-                    <ListItemIcon>
-                      <notification.icon sx={{ color: notification.color }} />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography sx={{ color: "#fff", fontWeight: 600 }}>
-                          {notification.title}
-                        </Typography>
-                      }
-                      secondary={
-                        <Typography sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
-                          {notification.message}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                </React.Fragment>
+              {parsed?.Notifications?.map((notif: any, index: number) => (
+                notif.Checked == false ?
+                  <React.Fragment key={index}>
+                    <ListItem
+                      sx={{
+                        borderRadius: "16px",
+                        mb: 1,
+                        background: "rgba(255, 255, 255, 0.10)",
+                      }}
+                    >
+                      <ListItemIcon>
+                        {notif.Icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography sx={{ color: "#fff", fontWeight: 600 }}>
+                            {notif.Title}
+                          </Typography>
+                        }
+                        secondary={
+                          <Typography sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                            {notif.Description}
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
+                  </React.Fragment>
+                  : <Box key={index}></Box>
               ))}
             </List>
           </Paper>
